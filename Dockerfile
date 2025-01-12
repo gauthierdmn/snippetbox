@@ -1,10 +1,19 @@
 ARG MAINTAINER="astro.gauthier@loftorbital.com"
 
 # First stage: Build the Go application
-FROM golang:1.21 AS dev
+FROM golang:1.23.4 AS dev
 
 # Create the directory and set it as the working directory
 WORKDIR /app
+
+# Install migrate CLI
+RUN go install -tags 'postgres' github.com/golang-migrate/migrate/v4/cmd/migrate@v4.18.1
+
+# Copy go.mod and go.sum
+COPY go.mod go.sum ./
+
+# Download dependencies
+RUN go mod download
 
 # Copy the entire project into the working directory
 COPY . .
@@ -34,6 +43,7 @@ WORKDIR /home/nonroot
 # Copy the built binary and UI static files from the first stage to the non-root user's home directory
 COPY --chown=nonroot:nonroot --from=build /app/main /home/nonroot/
 COPY --chown=nonroot:nonroot --from=build /app/ui /home/nonroot/ui
+COPY --chown=nonroot:nonroot --from=build /app/db /home/nonroot/db
 
 # The application listens on port 8000 by default, expose it
 EXPOSE 8000

@@ -5,6 +5,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/golang-migrate/migrate/v4"
+	_ "github.com/golang-migrate/migrate/v4/database/postgres"
+	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
 type application struct {
@@ -14,6 +18,8 @@ type application struct {
 
 func main() {
 	addr := flag.String("addr", ":4000", "HTTP network address")
+	databaseUrl := flag.String("databaseUrl", os.Getenv("DATABASE_URL"), "URL of the database")
+	migrationUrl := flag.String("migrationUrl", os.Getenv("MIGRATION_URL"), "URL of the database migration files")
 	flag.Parse()
 
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -24,6 +30,21 @@ func main() {
 		infoLog:  infoLog,
 	}
 
+	// Initialize the migrate instance
+	m, err := migrate.New(
+		*migrationUrl,
+		*databaseUrl,
+	)
+
+	if err != nil {
+		errorLog.Fatalf("Failed to create migrate instance: %v", err)
+	}
+
+	// Apply migrations
+	if err := m.Up(); err != nil && err != migrate.ErrNoChange {
+		errorLog.Fatalf("Migration failed: %v", err)
+	}
+
 	srv := http.Server{
 		Addr:     *addr,
 		ErrorLog: errorLog,
@@ -31,6 +52,6 @@ func main() {
 	}
 
 	infoLog.Printf("Starting web server on %s", *addr)
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
