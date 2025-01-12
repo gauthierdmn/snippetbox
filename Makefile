@@ -21,7 +21,7 @@ image: ## Build production image
 .PHONY: image
 
 dev: dev-image ## Run development container
-	docker run \
+	. ./.env && docker run \
 		--name=$(project_name)-dev \
 		-it \
 		--rm \
