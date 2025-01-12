@@ -40,4 +40,5 @@ jobs:
         run: docker pull ghcr.io/gauthierdmn/snipperbox/dev:${GITHUB_SHA}
 
       - name: "Run unit tests"
-        run: go test ./cmd/web
+        run: |
+          docker run --rm ghcr.io/gauthierdmn/snipperbox/dev:${GITHUB_SHA} go test ./cmd/web
