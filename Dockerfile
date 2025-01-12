@@ -34,7 +34,6 @@ WORKDIR /home/nonroot
 # Copy the built binary and UI static files from the first stage to the non-root user's home directory
 COPY --chown=nonroot:nonroot --from=build /app/main /home/nonroot/
 COPY --chown=nonroot:nonroot --from=build /app/ui /home/nonroot/ui
-COPY --chown=nonroot:nonroot --from=build /app/internal /home/nonroot/internal
 
 # The application listens on port 8000 by default, expose it
 EXPOSE 8000
