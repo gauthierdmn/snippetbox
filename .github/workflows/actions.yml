@@ -21,8 +21,8 @@ jobs:
 
       - name: "Build Docker Image"
         run: |
-          docker build --target=${{ matrix.target }} --tag ghcr.io/gauthierdmn/container-registry/${{ matrix.target }}:${GITHUB_SHA} .
-          docker push ghcr.io/gauthierdmn/container-registry/${{ matrix.target }}:${GITHUB_SHA}
+          docker build --target=${{ matrix.target }} --tag ghcr.io/gauthierdmn/snipperbox/${{ matrix.target }}:${GITHUB_SHA} .
+          docker push ghcr.io/gauthierdmn/snipperbox/${{ matrix.target }}:${GITHUB_SHA}
 
   test:
     name: Run Tests
@@ -37,7 +37,7 @@ jobs:
           password: ${{secrets.GITHUB_TOKEN}}
 
       - name: "Pull Dev Docker Image"
-        run: docker pull ghcr.io/gauthierdmn/container-registry/dev:${GITHUB_SHA}
+        run: docker pull ghcr.io/gauthierdmn/snipperbox/dev:${GITHUB_SHA}
 
       - name: "Run unit tests"
         run: go test ./cmd/web
